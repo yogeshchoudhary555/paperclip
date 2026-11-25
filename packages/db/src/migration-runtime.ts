@@ -18,6 +18,7 @@ type EmbeddedPostgresCtor = new (opts: {
   password: string;
   port: number;
   persistent: boolean;
+  createPostgresUser?: boolean;
   initdbFlags?: string[];
   onLog?: (message: unknown) => void;
   onError?: (message: unknown) => void;
@@ -142,6 +143,9 @@ async function ensureEmbeddedPostgresConnection(
     password: "paperclip",
     port: selectedPort,
     persistent: true,
+    // Root-host fix (fork): embedded Postgres refuses to run as root;
+    // let the embedded-postgres package create + run as a dedicated OS user.
+    createPostgresUser: true,
     initdbFlags: ["--encoding=UTF8", "--locale=C", "--lc-messages=C"],
     onLog: logBuffer.append,
     onError: logBuffer.append,
